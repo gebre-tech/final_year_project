@@ -1,9 +1,8 @@
 #contacts/urls.py
 from django.urls import path
-from . import views
-
+from contacts.views import AddFriendView, GetContactsView
 urlpatterns = [
-    path('add/', views.AddFriendView.as_view(), name='add_friend'),
-    path('list/', views.GetContactsView.as_view(), name='get_contacts'),
+    path('add/', AddFriendView.as_view(), name='add_friend'),
+    path('list/',GetContactsView.as_view(), name='get_contacts'),
 ]
 

@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from authentication.models import User
+
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,14 +39,6 @@ class LoginSerializer(serializers.Serializer):
         return {
             "refresh": str(refresh),
             "access": str(refresh.access_token),
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "username": user.username,  # Replace 'name' with 'username'
-                # Add more fields if needed:
-                # "full_name": user.get_full_name(),
-                # "first_name": user.first_name,
-                # "last_name": user.last_name,
-            }
+            'user': UserSerializer(user).data,
         }
 
