@@ -6,7 +6,9 @@ from rest_framework import status
 from .models import Contact
 from .serializers import ContactSerializer
 from authentication.models import User
+from authentication.serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 
 class AddFriendView(APIView):
     permission_classes = [IsAuthenticated]
@@ -36,5 +38,30 @@ class GetContactsView(APIView):
 
     def get(self, request):
         contacts = Contact.objects.filter(user=request.user)
-        serializer = ContactSerializer(contacts, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        paginated_contacts = paginator.paginate_queryset(contacts, request)
+        serializer = ContactSerializer(paginated_contacts, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+class SearchContactsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get('query', '')
+        contacts = Contact.objects.filter(user=request.user, friend__username__icontains=query)
+        paginator = PageNumberPagination()
+        paginated_contacts = paginator.paginate_queryset(contacts, request)
+        serializer = ContactSerializer(paginated_contacts, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+class SearchUsersView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get('query', '')
+        if not query:
+            return Response({"error": "Query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        users = User.objects.filter(username__icontains(query))
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
