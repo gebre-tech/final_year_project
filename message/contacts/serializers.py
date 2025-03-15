@@ -1,4 +1,3 @@
-#contacts/serializers.py
 from rest_framework import serializers
 from .models import Contact
 from authentication.serializers import UserSerializer
@@ -10,5 +9,5 @@ class ContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contact
-        fields = ['user', 'friend', 'friend_id', 'created_at']
-
+        fields = ['id', 'user', 'friend', 'friend_id', 'created_at']
+        read_only_fields = ['user', 'created_at']
